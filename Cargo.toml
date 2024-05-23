@@ -1,0 +1,8 @@
+[package]
+name = "rsps"
+version = "0.1.0"
+edition = "2021"
+authors = [ "Georgi <georgitarashev@gmail.com>" ]
+readme = "README.md"
+repository = "https://github.com/gtarashev/rsps"
+license = "MIT"
