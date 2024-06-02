@@ -1,41 +1,59 @@
 /***        modules             ***/
 mod commands;
 mod environment;
+mod input;
+mod config;
 
 /***        imports             ***/
 use commands::process_command;
-use std::io::{stdin, stdout, Write};
+use input::get_char;
+use config::initialise;
+use std::io::{stdout, Write};
 
 /***        methods             ***/
 fn rsps_loop(env: &mut environment::Environment) {
     let mut input = String::new();
+    let mut complete = true;
 
     loop {
-        print!("{}", &env.ps1);
+        if complete {
+            print!("{}", &env.ps1);
+            if let Err(e) = stdout().flush() {
+                eprintln!("Error flushing stdout: {}", e);
+            }
+
+            complete = false;
+        }
+
+        let char = get_char();
+
+        match char {
+            '\n' => {
+                complete = true;
+                println!();
+            },
+            _ => {
+                input = format!("{}{}", input, char);
+                print!("{}", char);
+            },
+        }
+        
         if let Err(e) = stdout().flush() {
             eprintln!("Error flushing stdout: {}", e);
         }
 
-        match stdin().read_line(&mut input) {
-            Ok(_) => (),
-            Err(err) => {
-                eprintln!("Error reading input: {}", err);
-                break;
+        if complete {
+            match process_command(env, &input) {
+                Some(1) => break,
+                _ => (),
             }
+            input.clear();
         }
-
-
-        match process_command(env, &input) {
-            Some(1) => break,
-            _ => (),
-        }
-
-        input.clear();
     }
 }
 
 /***        main                ***/
 fn main() {
-    let mut env: environment::Environment = environment::Environment::new(String::from("> "));
+    let mut env = initialise();
     rsps_loop(&mut env);
 }

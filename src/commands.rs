@@ -28,7 +28,7 @@ pub fn process_command(env: &mut Environment, input: &str) -> Option<i8> {
                 } else {
                     env.previous_code = 0;
                 }
-            }
+            },
             "previous" => println!("{}", env.previous_code),
             "exit" => return Some(1),
             command => {
@@ -54,7 +54,7 @@ pub fn process_command(env: &mut Environment, input: &str) -> Option<i8> {
                         eprintln!("Error: {}", e);
                     }
                 }
-            }
+            },
         }
     }
     
