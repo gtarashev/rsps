@@ -29,6 +29,7 @@ pub fn process_command(env: &mut Environment, input: &str) -> Option<i8> {
                     env.previous_code = 0;
                 }
             },
+            "history" => println!("{:?}", env.history),
             "previous" => println!("{}", env.previous_code),
             "exit" => return Some(1),
             command => {
