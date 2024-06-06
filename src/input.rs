@@ -15,9 +15,8 @@ pub fn std_get_char() -> char {
 // some special characters, such as arrow keys are up to 3 bytes long, this means that reading a
 // single byte and turning it into a character is not enough, the reading will most likely be done
 // using this method, as opposed to `get_char`, but keeping other one just in case
-pub fn std_read_into_buffer() -> (usize, [u8; 3]) {
+pub fn std_read_into_buffer(buffer: &mut [u8; 3]) -> usize {
     let mut reader = io::stdin();
-    let mut buffer = [0;3];
-    let size = reader.read(&mut buffer).unwrap();
-    return (size, buffer);
+    let size = reader.read(buffer).unwrap();
+    return size;
 }

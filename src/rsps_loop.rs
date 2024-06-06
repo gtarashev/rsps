@@ -12,36 +12,32 @@ pub fn shell_loop(env: &mut environment::Environment) {
     display_ps1(&env.ps1);
 
     let mut popped = 0; /* used if a character has been deleted */
-    let mut buffer;
-    let mut buffer_size;
-    let mut character;
+    let mut buffer = [0; 3];
     loop {
-        (buffer_size, buffer) = std_read_into_buffer();
-        if buffer_size > 1 {
-            continue;
-        }
-        character = buffer[0] as char;
-
-        match character {
-            '\n' => {
+        _ = std_read_into_buffer(&mut buffer); /* we dont use the buffer_size */
+        match buffer {
+            [10, 0, 0] => { /* newline */
                 complete = true;
                 input = format!("{}{}", input, '\n');
             },
-            '\u{3}' => { /* CTRL + C */
+            [3, 0, 0] => { /* CTRL + C */
                 env.previous_code = 1;
                 println!();
                 input.clear();
                 complete = false;
             },
-            '\u{7f}' => { /* backspace */
+            [127, 0, 0] => { /* backspace */
                 input.pop();
                 popped = 1;    
             }
-            '\0' => (), /* read timed out */
-            _ => {
-                input = format!("{}{}", input, character);
+            [0, 0, 0] => (), /* read timed out */
+            [x, 0, 0] => {
+                input = format!("{}{}", input, x as char);
             },
+            _ => (), /* escape sequence not implemented */
         }
+        // empty the buffer
+        buffer = [0; 3];
         
         // put cursor at the beginning of the line. this means that the next print will overwrite
         // the previous one and appear as if we aren't re-printing every time read_character returns,
