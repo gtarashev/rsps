@@ -7,6 +7,11 @@ use std::process::{Command, Stdio, Child};
 
 /***            methods             ***/
 pub fn process_command(env: &mut Environment, input: &str) -> Option<i8> {
+    if input == "\n".to_string() {
+        env.previous_code = 0;
+        return None;
+    }
+
     env.history.push_back(input.trim().to_string());
     // when initialised, first element is empty, we want to remove that element
     // so the history is cleaner
