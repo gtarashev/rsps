@@ -5,6 +5,7 @@ mod input;
 mod config;
 mod rsps_loop;
 mod output;
+mod keymaps;
 
 /***        imports             ***/
 use config::{initialise, reset_term};
