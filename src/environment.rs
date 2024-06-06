@@ -2,6 +2,7 @@
 use std::fmt::{Display, Formatter, Result};
 use std::path::PathBuf;
 use std::env;
+use std::collections::VecDeque;
 use termios::Termios;
 
 /***        structs             ***/
@@ -10,7 +11,7 @@ pub struct Environment {
     pub ps1: String,
     pub previous_code: i32,
     pub previous_dir: PathBuf,
-    pub history: Vec<String>,
+    pub history: VecDeque<String>,
     pub termios: Termios,
 }
 
@@ -29,7 +30,7 @@ impl Environment {
             ps1,
             previous_code: 0,
             previous_dir: env::current_dir().expect("couldn't set previous dir"),
-            history: Vec::new(),
+            history: VecDeque::new(),
             termios,
         }
     }

@@ -7,6 +7,13 @@ use std::process::{Command, Stdio, Child};
 
 /***            methods             ***/
 pub fn process_command(env: &mut Environment, input: &str) -> Option<i8> {
+    env.history.push_back(input.trim().to_string());
+    // when initialised, first element is empty, we want to remove that element
+    // so the history is cleaner
+    if env.history[0] == "".to_string() { 
+        env.history.pop_front();
+    }
+
     let mut command_list = input.trim().split("|").peekable();
     let mut previous_command = None;
     
