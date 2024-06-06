@@ -41,7 +41,13 @@ pub fn process_command(env: &mut Environment, input: &str) -> Option<i8> {
                     env.previous_code = 0;
                 }
             },
-            "history" => println!("{:?}", env.history),
+            "history" => {
+                let mut history_copy = env.history.clone();
+                history_copy.make_contiguous();
+                for command in history_copy {
+                    println!("{}", command);
+                }
+            },
             "previous" => println!("{}", env.previous_code),
             "exit" => return Some(1),
             command => {
