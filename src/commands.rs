@@ -5,7 +5,7 @@ use std::env;
 use std::path::Path;
 use std::process::{Command, Stdio, Child};
 
-/***            methods             ***/
+/***        functions           ***/
 pub fn process_command(env: &mut Environment, input: &str) -> Option<i8> {
     if input == "\n".to_string() {
         env.previous_code = 0;
