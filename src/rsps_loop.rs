@@ -50,11 +50,11 @@ pub fn shell_loop(env: &mut environment::Environment) {
                     history_counter -= 1;
                 }
             },
-            READ_TIMEOUT => (),
+            READ_TIMEOUT => continue,
             [x, 0, 0] => {
                 input = format!("{}{}", input, x as char);
             },
-            _ => (), /* escape sequence not implemented */
+            _ => continue, /* escape sequence not implemented */
         }
         // empty the buffer
         buffer = [0; 3];
