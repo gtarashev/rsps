@@ -1,0 +1,4 @@
+- handle up and down arrow keys
+- keep hold of the current command 
+- move through history and edit that
+
