@@ -5,8 +5,20 @@ use std::env;
 use std::path::Path;
 use std::process::{Command, Stdio, Child};
 
-/***            methods             ***/
+/***        functions           ***/
 pub fn process_command(env: &mut Environment, input: &str) -> Option<i8> {
+    if input == "\n".to_string() {
+        env.previous_code = 0;
+        return None;
+    }
+
+    env.history.push_back(input.trim().to_string());
+    // when initialised, first element is empty, we want to remove that element
+    // so the history is cleaner
+    if env.history[0] == "".to_string() { 
+        env.history.pop_front();
+    }
+
     let mut command_list = input.trim().split("|").peekable();
     let mut previous_command = None;
     
@@ -27,6 +39,13 @@ pub fn process_command(env: &mut Environment, input: &str) -> Option<i8> {
                     env.previous_code = 1;
                 } else {
                     env.previous_code = 0;
+                }
+            },
+            "history" => {
+                let mut history_copy = env.history.clone();
+                history_copy.make_contiguous();
+                for command in history_copy {
+                    println!("{}", command);
                 }
             },
             "previous" => println!("{}", env.previous_code),

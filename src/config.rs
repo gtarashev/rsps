@@ -1,4 +1,5 @@
 /*          imports             */
+use std::io::{stdin, stdout};
 use termios::{Termios, tcsetattr};
 use termios::{TCSANOW, ECHO, ICANON, ISIG, IEXTEN};
 use termios::{VMIN, VTIME};
@@ -24,5 +25,7 @@ pub fn reset_term(env: &Environment) {
 
 pub fn initialise() -> Environment {
     let termios = init_term();
-    Environment::new("> ".to_string(), termios)
+    let stdin = stdin().lock();
+    let stdout = stdout().lock();
+    Environment::new("> ".to_string(), termios, stdin, stdout)
 }
