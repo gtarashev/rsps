@@ -1,5 +1,5 @@
 use crate::commands::process_command;
-use crate::input::std_read_into_buffer;
+use crate::input::read_into_buffer;
 use crate::environment;
 use crate::output::{print_line, clear_line};
 use crate::keymaps::*;
@@ -17,7 +17,7 @@ pub fn shell_loop(env: &mut environment::Environment) {
 
     loop {
         // buffer size is not used
-        _ = std_read_into_buffer(&mut env.stdin_handle, &mut buffer);
+        _ = read_into_buffer(&mut env.stdin_handle, &mut buffer);
         match buffer {
             NEWLINE => {
                 complete = true;
