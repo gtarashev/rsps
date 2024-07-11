@@ -3,7 +3,7 @@ use std::io::Write;
 
 /*          functions           */
 pub fn clear_line<T: Write>(stdout: &mut T) {
-    write!(stdout, "\r").unwrap();
+    write!(stdout, "\r\x1b[K").unwrap();
     if let Err(e) = stdout.flush() {
         eprintln!("Error flushing stdout: {}", e);
     }
