@@ -11,7 +11,6 @@ mod keymaps;
 use config::{initialise, reset_term};
 use rsps_loop::shell_loop;
 
-
 /***        main                ***/
 fn main() {
     let mut env = initialise();

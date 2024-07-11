@@ -4,8 +4,9 @@ use termios::{Termios, tcsetattr};
 use termios::{TCSANOW, ECHO, ICANON, ISIG, IEXTEN};
 use termios::{VMIN, VTIME};
 
-use libc::STDIN_FILENO;
 use crate::environment::Environment;
+
+const STDIN_FILENO: i32 = 1;
 
 /*          functions           */
 fn init_term() -> Termios {
