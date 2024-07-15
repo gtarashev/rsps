@@ -1,10 +1,10 @@
 /*          imports             */
-use std::io::{stdin, stdout};
+use std::io::{Read, Write, stdin, stdout};
 use termios::{Termios, tcsetattr};
 use termios::{TCSANOW, ECHO, ICANON, ISIG, IEXTEN};
-use termios::{VMIN, VTIME};
 
 use crate::environment::Environment;
+use crate::rsps_loop::shell_loop;
 
 const STDIN_FILENO: i32 = 1;
 
@@ -14,19 +14,21 @@ fn init_term() -> Termios {
     let mut new_termios = termios.clone();
 
     new_termios.c_lflag &= !(ICANON | ECHO | ISIG | IEXTEN);
-    new_termios.c_cc[VMIN] = 0;
-    new_termios.c_cc[VTIME] = 1;
     tcsetattr(STDIN_FILENO, TCSANOW, &mut new_termios).unwrap();
     return termios;
 }
 
-pub fn reset_term(env: &Environment) {
+fn reset_term<R, W>(env: &Environment<R, W>)
+where R: Read,
+      W: Write {
     tcsetattr(STDIN_FILENO, TCSANOW, &env.termios).unwrap();
 }
 
-pub fn initialise() -> Environment {
+pub fn initialise() {
     let termios = init_term();
-    let stdin = stdin().lock();
-    let stdout = stdout().lock();
-    Environment::new("> ".to_string(), termios, stdin, stdout)
+    let stdin = stdin();
+    let stdout = stdout();
+    let mut env = Environment::new("> ".to_string(), termios, stdin, stdout);
+    shell_loop(&mut env);
+    reset_term(&env);
 }

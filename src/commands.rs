@@ -1,12 +1,17 @@
 /***        imports             ***/
 use crate::environment::Environment;
-use std::collections::VecDeque;
-use std::env;
-use std::path::{Path, PathBuf};
-use std::process::{Command, Stdio, Child};
+use std::{
+    collections::VecDeque,
+    env,
+    path::{Path, PathBuf},
+    process::{Command, Stdio, Child},
+    io::{Read, Write},
+};
 
 /***        functions           ***/
-pub fn process_command(env: &mut Environment, input: &str) -> Option<i8> {
+pub fn process_command<R, W>(env: &mut Environment<R, W>, input: &str) -> Option<i8>
+where R: Read,
+      W: Write {
     if input == "\n".to_string() {
         env.previous_code = 0;
         return None;

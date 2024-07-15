@@ -1,3 +1,7 @@
+use std::{
+    io::{Read, Write},
+};
+
 use crate::commands::process_command;
 use crate::input::read_into_buffer;
 use crate::environment;
@@ -5,7 +9,9 @@ use crate::output::{print_line, clear_line};
 use crate::keymaps::*;
 
 /***        methods             ***/
-pub fn shell_loop(env: &mut environment::Environment) {
+pub fn shell_loop<R, W>(env: &mut environment::Environment<R, W>) 
+where R: Read,
+      W: Write {
     let mut input = String::new();
     let mut complete = false;
     let mut buffer = [0; 3];

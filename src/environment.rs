@@ -1,24 +1,31 @@
 /***        imports             ***/
-use std::fmt::{Display, Formatter, Result};
-use std::path::PathBuf;
-use std::env;
-use std::io::{StdinLock, StdoutLock};
-use std::collections::VecDeque;
+use std::{
+    fmt::{Display, Formatter, Result},
+    io::{Read, Write},
+    env::current_dir,
+    path::PathBuf,
+    collections::VecDeque,
+};
+
 use termios::Termios;
 
 /***        structs             ***/
-pub struct Environment {
+pub struct Environment<R, W>
+where R: Read,
+      W: Write {
     pub ps1: String,
     pub previous_code: i32,
     pub previous_dir: PathBuf,
     pub history: VecDeque<String>,
-    pub stdin_handle: StdinLock<'static>,
-    pub stdout_handle: StdoutLock<'static>,
+    pub stdin_handle: R,
+    pub stdout_handle: W,
     pub termios: Termios,
 }
 
 /***        functions           ***/
-impl Display for Environment {
+impl<R, W> Display for Environment<R, W>
+where R: Read,
+      W: Write {
     fn fmt(&self, f: &mut Formatter<'_>)
         -> Result
     {
@@ -26,12 +33,14 @@ impl Display for Environment {
     }
 }
 
-impl Environment {
-    pub fn new(ps1: String, termios: Termios, stdin_handle: StdinLock<'static>, stdout_handle: StdoutLock<'static>) -> Environment {
+impl<R, W> Environment<R, W>
+where R: Read,
+      W: Write {
+    pub fn new(ps1: String, termios: Termios, stdin_handle: R, stdout_handle: W) -> Environment<R, W> {
         Environment {
             ps1,
             previous_code: 0,
-            previous_dir: env::current_dir().expect("couldn't set previous dir"),
+            previous_dir: current_dir().expect("couldn't set previous dir"),
             history: VecDeque::new(),
             termios,
             stdin_handle,
