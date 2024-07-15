@@ -1,17 +1,17 @@
-use std::{
-    io::{Read, Write},
-};
+use std::io::{Read, Write};
 
 use crate::commands::process_command;
-use crate::input::read_into_buffer;
 use crate::environment;
-use crate::output::{print_line, clear_line};
+use crate::input::read_into_buffer;
 use crate::keymaps::*;
+use crate::output::{clear_line, print_line};
 
 /***        methods             ***/
-pub fn shell_loop<R, W>(env: &mut environment::Environment<R, W>) 
-where R: Read,
-      W: Write {
+pub fn shell_loop<R, W>(env: &mut environment::Environment<R, W>)
+where
+    R: Read,
+    W: Write,
+{
     let mut input = String::new();
     let mut complete = false;
     let mut buffer = [0; 3];
@@ -28,7 +28,7 @@ where R: Read,
             NEWLINE => {
                 complete = true;
                 input = format!("{}{}", input, '\n');
-            },
+            }
             CTRL_C => {
                 env.previous_code = 1;
                 input.push('\n');
@@ -36,16 +36,16 @@ where R: Read,
                 print_line(&mut env.stdout_handle, &env.ps1, &input);
                 input.clear();
                 complete = false;
-            },
+            }
             BACKSPACE => {
                 input.pop();
-            },
+            }
             ARROW_DOWN => {
                 if history_counter != env.history.len() {
                     history_set = false;
                     history_counter += 1;
                 }
-            },
+            }
             ARROW_UP => {
                 if history_counter == env.history.len() {
                     current_command = input.clone();
@@ -55,11 +55,11 @@ where R: Read,
                     history_set = false;
                     history_counter -= 1;
                 }
-            },
+            }
             READ_TIMEOUT => continue,
             [x, 0, 0] => {
                 input = format!("{}{}", input, x as char);
-            },
+            }
             _ => continue, /* escape sequence not implemented */
         }
         // empty the buffer
@@ -68,13 +68,12 @@ where R: Read,
         if !history_set {
             if history_counter == env.history.len() {
                 input = current_command.clone();
-            }
-            else {
+            } else {
                 input = env.history[history_counter].clone();
             }
             history_set = true;
         }
-        
+
         clear_line(&mut env.stdout_handle);
         print_line(&mut env.stdout_handle, &env.ps1, &input);
 
@@ -84,7 +83,7 @@ where R: Read,
         complete = false;
 
         // exit command used
-        if Some(1) ==  process_command(env, &input) {
+        if Some(1) == process_command(env, &input) {
             break;
         }
 
@@ -97,4 +96,3 @@ where R: Read,
         print_line(&mut env.stdout_handle, &env.ps1, &input);
     }
 }
-

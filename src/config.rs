@@ -1,7 +1,7 @@
 /*          imports             */
-use std::io::{Read, Write, stdin, stdout};
-use termios::{Termios, tcsetattr};
-use termios::{TCSANOW, ECHO, ICANON, ISIG, IEXTEN};
+use std::io::{stdin, stdout, Read, Write};
+use termios::{tcsetattr, Termios};
+use termios::{ECHO, ICANON, IEXTEN, ISIG, TCSANOW};
 
 use crate::environment::Environment;
 use crate::rsps_loop::shell_loop;
@@ -19,8 +19,10 @@ fn init_term() -> Termios {
 }
 
 fn reset_term<R, W>(env: &Environment<R, W>)
-where R: Read,
-      W: Write {
+where
+    R: Read,
+    W: Write,
+{
     tcsetattr(STDIN_FILENO, TCSANOW, &env.termios).unwrap();
 }
 

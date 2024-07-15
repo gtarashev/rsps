@@ -1,6 +1,6 @@
 /*          imports             */
-use std::io::Write;
 use std::fmt::Display;
+use std::io::Write;
 
 /*          functions           */
 pub fn clear_line<T: Write>(stdout: &mut T) {
@@ -10,9 +10,11 @@ pub fn clear_line<T: Write>(stdout: &mut T) {
     }
 }
 
-pub fn print_line<T, D>(stdout: &mut T, ps1: &D, output: &D) 
-where T: Write,
-D: Display {
+pub fn print_line<T, D>(stdout: &mut T, ps1: &D, output: &D)
+where
+    T: Write,
+    D: Display,
+{
     write!(stdout, "{}{}", ps1, output).unwrap();
     if let Err(e) = stdout.flush() {
         eprintln!("Error flushing stdout: {}", e);
