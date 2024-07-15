@@ -8,5 +8,4 @@ repository = "https://github.com/gtarashev/rsps"
 license = "MIT"
 
 [dependencies]
-libc = "0.2.155"
 termios = "0.3.3"

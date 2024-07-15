@@ -8,13 +8,9 @@ mod output;
 mod keymaps;
 
 /***        imports             ***/
-use config::{initialise, reset_term};
-use rsps_loop::shell_loop;
-
+use config::initialise;
 
 /***        main                ***/
 fn main() {
-    let mut env = initialise();
-    shell_loop(&mut env);
-    reset_term(&env);
+    initialise();
 }

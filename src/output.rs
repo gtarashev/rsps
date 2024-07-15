@@ -1,15 +1,18 @@
 /*          imports             */
-use std::io::{Write, StdoutLock};
+use std::io::Write;
+use std::fmt::Display;
 
 /*          functions           */
-pub fn clear_line(stdout: &mut StdoutLock<'static>) {
-    write!(stdout, "\x1b[{}D\x1b[K", 9999999).unwrap();
+pub fn clear_line<T: Write>(stdout: &mut T) {
+    write!(stdout, "\r\x1b[K").unwrap();
     if let Err(e) = stdout.flush() {
         eprintln!("Error flushing stdout: {}", e);
     }
 }
 
-pub fn print_line(stdout: &mut StdoutLock<'static>, ps1: &String, output: &String) {
+pub fn print_line<T, D>(stdout: &mut T, ps1: &D, output: &D) 
+where T: Write,
+D: Display {
     write!(stdout, "{}{}", ps1, output).unwrap();
     if let Err(e) = stdout.flush() {
         eprintln!("Error flushing stdout: {}", e);

@@ -1,12 +1,17 @@
 /***        imports             ***/
 use crate::environment::Environment;
-use std::collections::VecDeque;
-use std::env;
-use std::path::Path;
-use std::process::{Command, Stdio, Child};
+use std::{
+    collections::VecDeque,
+    env,
+    path::{Path, PathBuf},
+    process::{Command, Stdio, Child},
+    io::{Read, Write},
+};
 
 /***        functions           ***/
-pub fn process_command(env: &mut Environment, input: &str) -> Option<i8> {
+pub fn process_command<R, W>(env: &mut Environment<R, W>, input: &str) -> Option<i8>
+where R: Read,
+      W: Write {
     if input == "\n".to_string() {
         env.previous_code = 0;
         return None;
@@ -27,13 +32,18 @@ pub fn process_command(env: &mut Environment, input: &str) -> Option<i8> {
         
         match arguments.pop_front().unwrap_or("") {
             "cd" => {
-                env.previous_dir = env::current_dir().expect("couldn't get current dir");
-                let mut new_dir = "/home/jojito";
-                if let Some(x) = arguments.pop_front() {
-                    new_dir = x;
-                }
+                let new_dir = match arguments.pop_front() {
+                    Some("-") => env.previous_dir.clone(),
+                    Some(x) => x.to_string().into(),
+                    None => std::env::var("HOME").unwrap_or(String::from("/")).into(),
+                };
 
-                let root = Path::new(new_dir);
+                env.previous_dir = env::current_dir().map_err(|err| {
+                    eprintln!("Error: couldn't get previous directory: {err}");
+                    PathBuf::from("/")
+                }).unwrap();
+
+                let root = Path::new(&new_dir);
                 if let Err(e) = env::set_current_dir(&root) {
                     eprintln!("{}", e);
                     env.previous_code = 1;
