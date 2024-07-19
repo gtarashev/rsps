@@ -4,6 +4,7 @@ mod config;
 mod environment;
 mod input;
 mod keymaps;
+mod lexer;
 mod output;
 mod rsps_loop;
 

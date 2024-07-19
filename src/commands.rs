@@ -1,14 +1,13 @@
 /***        imports             ***/
 use crate::environment::Environment;
+use crate::lexer::Lexer;
 use std::{
-    collections::VecDeque,
     env,
     io::{Read, Write},
     path::{Path, PathBuf},
     process::{Child, Command, Stdio},
 };
 
-/***        functions           ***/
 pub fn process_command<R, W>(env: &mut Environment<R, W>, input: &str) -> Option<i8>
 where
     R: Read,
@@ -20,24 +19,42 @@ where
     }
 
     env.history.push_back(input.trim().to_string());
-    // when initialised, first element is empty, we want to remove that element
-    // so the history is cleaner
     if env.history[0] == "".to_string() {
         env.history.pop_front();
     }
 
-    let mut command_list = input.trim().split("|").peekable();
+    let command = input.chars().collect::<Vec<_>>();
+    let mut command_list: Vec<Vec<String>> = vec![];
+    let mut cl_count = command_list.len();
     let mut previous_command = None;
+    let lexer = Lexer::new(&command);
+    for i in lexer.into_iter() {
+        let i = String::from_iter(i);
+        if cl_count == command_list.len() {
+            command_list.push(vec![i]);
+            continue;
+        }
+
+        if i == "|" {
+            cl_count += 1;
+            continue;
+        }
+
+        command_list[cl_count].push(i);
+    }
+
+    let mut command_list = command_list.into_iter().peekable();
 
     while let Some(x) = command_list.next() {
-        let mut arguments: VecDeque<&str> = x.trim().split_whitespace().collect();
-
-        match arguments.pop_front().unwrap_or("") {
+        match &x[0][..] {
             "cd" => {
-                let new_dir = match arguments.pop_front() {
-                    Some("-") => env.previous_dir.clone(),
-                    Some(x) => x.to_string().into(),
-                    None => std::env::var("HOME").unwrap_or(String::from("/")).into(),
+                let new_dir = if x.len() == 1 {
+                    std::env::var("HOME").unwrap_or(String::from("/")).into()
+                } else {
+                    match &x[1][..] {
+                        "-" => env.previous_dir.clone(),
+                        x => x.to_string().into(),
+                    }
                 };
 
                 env.previous_dir = env::current_dir()
@@ -81,7 +98,7 @@ where
                 };
 
                 let child = Command::new(command)
-                    .args(arguments)
+                    .args(&x[1..])
                     .stdin(stdin)
                     .stdout(stdout)
                     .spawn();
